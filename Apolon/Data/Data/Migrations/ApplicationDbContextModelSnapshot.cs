@@ -211,6 +211,30 @@ namespace Apolon.Migrations
                     b.HasKey("TrainerId");
 
                     b.ToTable("Trainers");
+
+                    b.HasData(
+                        new
+                        {
+                            TrainerId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Description = "Most muscular man in history!",
+                            Email = "vezenkov07@gmail.com",
+                            FirstName = "Luboslav",
+                            Gender = 'M',
+                            ImageUrl = "/images/trainers/me.jpg",
+                            LastName = "Vezenkov",
+                            PhoneNumber = "+359888747824"
+                        },
+                        new
+                        {
+                            TrainerId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Description = "The best dog in the world. Can teach you how to hunt cats.",
+                            Email = "ornelamuti@gmail.com",
+                            FirstName = "Ornela",
+                            Gender = 'F',
+                            ImageUrl = "/images/trainers/ornela.jpg",
+                            LastName = "Muti",
+                            PhoneNumber = "+3596969696969"
+                        });
                 });
 
             modelBuilder.Entity("Apolon.Data.Models.User", b =>
