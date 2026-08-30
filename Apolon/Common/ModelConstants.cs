@@ -127,6 +127,10 @@ public static class ModelConstants
         public const double HeightMax = 250.0;
         public const string HeightRequiredErrorMessage = "Height is required!";
         public const string HeightRangeErrorMessage = "Height must be between 100.0 cm and 250.0 cm!";
+        
+        public const string PasswordRequiredErrorMessage = "Password is required!";
+        public const string EmailRequiredErrorMessage = "Email is required!";
+        public const string EmailInvalidErrorMessage = "Email is invalid!";
     }
     public static class Workout
     {

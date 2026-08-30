@@ -248,6 +248,11 @@ namespace Apolon.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasComment("Date of birth of the user");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasComment("Email of the user");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -263,6 +268,11 @@ namespace Apolon.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasComment("Last name of the user");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasComment("Hashed password of the user");
 
                     b.Property<double>("Weight")
                         .HasColumnType("double precision")

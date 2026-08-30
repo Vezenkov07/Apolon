@@ -2,6 +2,7 @@ using Apolon.Data.Data;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,29 @@ builder.Services.Configure<RazorViewEngineOptions>(options =>
     options.ViewLocationFormats.Add("/Web/Views/{1}/{0}.cshtml");
     options.ViewLocationFormats.Add("/Web/Views/Shared/{0}.cshtml");
 });
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+    })
+    .AddCookie("ExternalCookie") // Temporary cookie for social logins
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "Placeholder";
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "Placeholder";
+        options.SignInScheme = "ExternalCookie";
+    })
+    .AddFacebook(options =>
+    {
+        options.AppId = builder.Configuration["Authentication:Facebook:AppId"] ?? "Placeholder";
+        options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"] ?? "Placeholder";
+        options.SignInScheme = "ExternalCookie";
+    });
 
 var app = builder.Build();
 
@@ -40,6 +64,7 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

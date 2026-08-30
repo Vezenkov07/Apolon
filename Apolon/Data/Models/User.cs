@@ -23,17 +23,21 @@ public class User
     public string LastName { get; set; } = string.Empty;
 
     [Comment("Date of birth of the user")]
-    [Required(ErrorMessage = ModelConstants.User.DateOfBirthRequiredErrorMessage)]
     [DataType(DataType.Date)]
     public DateTime DateOfBirth { get; set; }
 
     [Comment("Weight of the user in kilograms")]
-    [Required(ErrorMessage = ModelConstants.User.WeightRequiredErrorMessage)]
     [Range(ModelConstants.User.WeightMin, ModelConstants.User.WeightMax, ErrorMessage = ModelConstants.User.WeightRangeErrorMessage)]
     public double Weight { get; set; }
 
     [Comment("Height of the user in centimeters")]
-    [Required(ErrorMessage = ModelConstants.User.HeightRequiredErrorMessage)]
     [Range(ModelConstants.User.HeightMin, ModelConstants.User.HeightMax, ErrorMessage = ModelConstants.User.HeightRangeErrorMessage)]
     public double Height { get; set; }
+    [Comment("Hashed password of the user")]
+    [Required(ErrorMessage = ModelConstants.User.PasswordRequiredErrorMessage)]
+    public string PasswordHash { get; set; } = string.Empty;
+     [Comment("Email of the user")]
+     [EmailAddress(ErrorMessage = ModelConstants.User.EmailInvalidErrorMessage)]
+     [Required(ErrorMessage = ModelConstants.User.EmailRequiredErrorMessage)]
+    public string Email { get; set; }
 }
