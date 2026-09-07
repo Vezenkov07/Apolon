@@ -1,0 +1,109 @@
+@model Apolon.Data.Models.ViewModels.AccountViewModel
+
+@{
+    ViewData["Title"] = "My Account";
+}
+
+<div class="py-5">
+    <div class="page-heading text-start mx-0 mb-4">
+        <div class="hero-kicker">Your progress hub</div>
+        <h1 class="display-5 fw-bold">My account</h1>
+        <p>Keep your memberships, purchases, and training plan in one place.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] is string successMessage)
+    {
+        <div class="alert alert-success" role="alert">@successMessage</div>
+    }
+
+    <div class="row g-4 mt-2">
+        <div class="col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h4">Memberships</h2>
+                    @if (Model.Cards.Count == 0)
+                    {
+                        <p class="text-muted mb-0">No memberships purchased yet.</p>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var card in Model.Cards)
+                            {
+                                <li class="list-group-item px-0 d-flex justify-content-between">
+                                    <span>@card.CardType membership</span>
+                                    <strong>@card.Price.ToString("F2") лв.</strong>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h4">Supplement purchases</h2>
+                    @if (Model.SupplementPurchases.Count == 0)
+                    {
+                        <p class="text-muted mb-0">No supplement purchases yet.</p>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var purchase in Model.SupplementPurchases)
+                            {
+                                <li class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <span>@purchase.Quantity × @purchase.Supplement.Name</span>
+                                        <strong>@((purchase.UnitPrice * purchase.Quantity).ToString("F2")) лв.</strong>
+                                    </div>
+                                    <small class="text-muted">@purchase.PurchasedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</small>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="h4 mt-4">Your sessions</h2>
+    @if (Model.Sessions.Count == 0)
+    {
+        <div class="alert alert-info">You have no booked sessions yet.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                <tr>
+                    <th>Trainer</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var session in Model.Sessions)
+                {
+                    <tr>
+                        <td>@session.Trainer.FirstName @session.Trainer.LastName</td>
+                        <td>@session.BookingDate.ToString("dd MMM yyyy")</td>
+                        <td>@session.BookingTime.ToString("HH\\:mm")</td>
+                        <td class="text-end">
+                            <a asp-controller="Trainers" asp-action="Reschedule" asp-route-sessionId="@session.SessionId"
+                               class="btn btn-sm btn-outline-primary">Reschedule</a>
+                            <form asp-action="Cancel" method="post" class="d-inline">
+                                <input type="hidden" name="sessionId" value="@session.SessionId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -2,56 +2,67 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center text-white p-5 rounded-3 mb-5 shadow-lg" 
-     style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop') no-repeat center center; background-size: cover; padding-top: 100px !important; padding-bottom: 100px !important;">
-    <h1 class="display-3 fw-bold mb-3 mt-4">Welcome to Apolon Gym</h1>
-    <p class="lead mb-4 fw-normal">Your hometown's premier fitness destination. Train hard, eat right, and achieve your goals.</p>
-    <a asp-controller="Cards" asp-action="Index" class="btn btn-warning btn-lg px-5 py-3 mb-4 fw-bold shadow">Join Now</a>
+<section class="hero-section">
+    <div class="hero-content">
+        <div class="hero-kicker">Built for people who refuse to settle</div>
+        <h1>Train with purpose. Live with power.</h1>
+        <p class="lead mb-4">Apolon is your complete performance system: expert coaching, structured workouts, and the tools to build your strongest self.</p>
+        <div class="d-flex flex-wrap gap-3">
+            <a asp-controller="Cards" asp-action="Index" class="btn btn-warning btn-lg px-4">Start your journey</a>
+            <a asp-controller="Trainers" asp-action="Index" class="btn btn-outline-light btn-lg px-4">Meet the coaches</a>
+        </div>
+    </div>
+</section>
+
+<div class="page-heading">
+    <div class="hero-kicker justify-content-center">Everything you need to progress</div>
+    <h2 class="display-6 fw-bold">One place. No excuses.</h2>
+    <p>Choose your next challenge and make every session count.</p>
 </div>
 
-<div class="container mb-5">
+<div class="mb-5">
     <div class="row g-4">
         
         <div class="col-md-6 col-lg-3">
-            <div class="card h-100 shadow-sm border-0 bg-light transition-hover">
-                <div class="card-body text-center p-4 flex-column d-flex">
-                    <h1 class="display-4 mb-3">💪</h1>
-                    <h5 class="card-title fw-bold">Our Trainers</h5>
-                    <p class="card-text text-muted mb-4">Meet our expert coaches who will guide you to success.</p>
-                    <a asp-controller="Trainers" asp-action="Index" class="btn btn-outline-dark mt-auto w-100 fw-semibold">View Trainers</a>
+            <div class="feature-card card border-0">
+                <div class="card-body p-0 d-flex flex-column">
+                    <div class="feature-icon">💪</div>
+                    <h5 class="card-title fw-bold">Expert coaching</h5>
+                    <p class="card-text text-muted mb-4">Meet coaches who turn ambition into measurable progress.</p>
+                    <a asp-controller="Trainers" asp-action="Index" class="btn btn-outline-light mt-auto w-100">Meet the team</a>
                 </div>
             </div>
         </div>
         
         <div class="col-md-6 col-lg-3">
-            <div class="card h-100 shadow-sm border-0 bg-light transition-hover">
-                <div class="card-body text-center p-4 flex-column d-flex">
-                    <h1 class="display-4 mb-3">🔥</h1>
-                    <h5 class="card-title fw-bold">Workouts</h5>
-                    <p class="card-text text-muted mb-4">Discover customized splits and training programs.</p>
-                    <a asp-controller="Workouts" asp-action="Index" class="btn btn-outline-dark mt-auto w-100 fw-semibold">View Workouts</a>
+            <div class="feature-card card border-0">
+                <div class="card-body p-0 d-flex flex-column">
+                    <div class="feature-icon">🔥</div>
+                    <h5 class="card-title fw-bold">Structured workouts</h5>
+                    <p class="card-text text-muted mb-4">Follow focused programs designed to keep your momentum high.</p>
+                    <a asp-controller="Workouts" asp-action="Index" class="btn btn-outline-light mt-auto w-100">Explore workouts</a>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 col-lg-3">
-            <div class="card h-100 shadow-sm border-0 bg-light transition-hover">
-                <div class="card-body text-center p-4 flex-column d-flex">
-                    <h1 class="display-4 mb-3">💊</h1>
-                    <h5 class="card-title fw-bold">Supplement Store</h5>
-                    <p class="card-text text-muted mb-4">Fuel your gains with top-tier protein and pre-workouts.</p>
-                    <a asp-controller="Supplements" asp-action="Index" class="btn btn-outline-dark mt-auto w-100 fw-semibold">Shop Now</a>
+            <div class="feature-card card border-0">
+                <div class="card-body p-0 d-flex flex-column">
+                    <div class="feature-icon">⚡</div>
+                    <h5 class="card-title fw-bold">Fuel your edge</h5>
+                    <p class="card-text text-muted mb-4">Shop trusted supplements selected for performance and recovery.</p>
+                    <a asp-controller="Supplements" asp-action="Index" class="btn btn-outline-light mt-auto w-100">Visit the store</a>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 col-lg-3">
-            <div class="card h-100 shadow-sm border-warning bg-light transition-hover" style="border-width: 2px !important;">
-                <div class="card-body text-center p-4 flex-column d-flex">
-                    <h1 class="display-4 mb-3">🎟️</h1>
-                    <h5 class="card-title fw-bold">Memberships</h5>
-                    <p class="card-text text-muted mb-4">Get your gym pass today and start your fitness journey.</p>
-                    <a asp-controller="Cards" asp-action="Index" class="btn btn-warning mt-auto w-100 fw-bold">Buy a Pass</a>
+            <div class="feature-card card border-0">
+                <div class="card-body p-0 d-flex flex-column">
+                    <div class="feature-icon">🎟️</div>
+                    <h5 class="card-title fw-bold">Your membership</h5>
+                    <p class="card-text text-muted mb-4">Get access to the space, support, and structure you need.</p>
+                    <a asp-controller="Cards" asp-action="Index" class="btn btn-warning mt-auto w-100">View memberships</a>
                 </div>
             </div>
         </div>

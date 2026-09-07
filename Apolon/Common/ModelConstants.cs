@@ -138,4 +138,18 @@ public static class ModelConstants
         public const string StartTimeRequiredErrorMessage = "Start time is required!";
         public const string EndTimeRequiredErrorMessage = "End time is required!";
     }
+
+    public static class BookSession
+    {
+        public const string BookingDateRequiredErrorMessage = "Please select booking date!";
+        
+        public const string BookingTimeRequiredErrorMessage = "Please select booking time!";
+        public const string BookingDatePastErrorMessage = "Booking date must be in the future!";
+        public const string BookingTimeUnavailableErrorMessage = "That time slot is no longer available!";
+        
+        public const int NoteMaxLength = 500;
+        public const int SessionDurationMinutes = 60;
+        public const int OpeningHour = 6;
+        public const int ClosingHour = 22;
+    }
 }

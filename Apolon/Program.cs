@@ -1,6 +1,7 @@
 using Apolon.Data.Data;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -12,7 +13,9 @@ builder.Services.AddControllersWithViews();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                         ?? "Host=localhost;Port=5432;Database=apolon;Username=postgres";
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString)
+        .ConfigureWarnings(warnings =>
+            warnings.Ignore(RelationalEventId.PendingModelChangesWarning)));
 
 builder.Services.Configure<RazorViewEngineOptions>(options =>
 {
@@ -22,7 +25,7 @@ builder.Services.Configure<RazorViewEngineOptions>(options =>
     options.ViewLocationFormats.Add("/Web/Views/Shared/{0}.cshtml");
 });
 
-builder.Services.AddAuthentication(options =>
+var authentication = builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     })
@@ -31,21 +34,39 @@ builder.Services.AddAuthentication(options =>
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";
     })
-    .AddCookie("ExternalCookie") // Temporary cookie for social logins
-    .AddGoogle(options =>
+    .AddCookie("ExternalCookie"); // Temporary cookie for social logins
+
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+{
+    authentication.AddGoogle(options =>
     {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "Placeholder";
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "Placeholder";
-        options.SignInScheme = "ExternalCookie";
-    })
-    .AddFacebook(options =>
-    {
-        options.AppId = builder.Configuration["Authentication:Facebook:AppId"] ?? "Placeholder";
-        options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"] ?? "Placeholder";
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
         options.SignInScheme = "ExternalCookie";
     });
+}
+
+var facebookAppId = builder.Configuration["Authentication:Facebook:AppId"];
+var facebookAppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+if (!string.IsNullOrWhiteSpace(facebookAppId) && !string.IsNullOrWhiteSpace(facebookAppSecret))
+{
+    authentication.AddFacebook(options =>
+    {
+        options.AppId = facebookAppId;
+        options.AppSecret = facebookAppSecret;
+        options.SignInScheme = "ExternalCookie";
+    });
+}
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

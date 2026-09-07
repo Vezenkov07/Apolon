@@ -1,0 +1,12 @@
+## .NET build output
+**/bin/
+**/obj/
+
+## Rider and user-specific settings
+.idea/
+*.user
+*.suo
+
+## Local configuration and secrets
+**/appsettings.Local.json
+**/appsettings.*.Local.json

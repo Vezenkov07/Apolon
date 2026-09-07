@@ -1,0 +1,27 @@
+@model Apolon.Data.Models.Workout
+
+@{
+    ViewData["Title"] = "Workout Details";
+}
+
+<div class="py-4">
+    <a asp-action="Index" class="btn btn-outline-secondary mb-4">← Back to workouts</a>
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h1 class="fw-bold">@Model.Split.SplitName</h1>
+            <p class="lead">
+                @Model.StartTime.ToLocalTime().ToString("dddd, dd MMMM yyyy")
+                from @Model.StartTime.ToLocalTime().ToString("HH:mm")
+                to @Model.EndTime.ToLocalTime().ToString("HH:mm")
+            </p>
+            <p><strong>Coach:</strong> @(Model.Trainer is null ? "Apolon team" : $"{Model.Trainer.FirstName} {Model.Trainer.LastName}")</p>
+            <h2 class="h5 mt-4">Targeted muscle groups</h2>
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var muscle in Model.Split.TargetedMuscles)
+                {
+                    <span class="badge bg-dark">@muscle</span>
+                }
+            </div>
+        </div>
+    </div>
+</div>

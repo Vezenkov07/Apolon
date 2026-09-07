@@ -1,0 +1,70 @@
+@model Apolon.Data.Models.ViewModels.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Secure Checkout";
+    string action = Model.PurchaseType == "Membership" ? "Membership" : "Supplement";
+}
+
+<div class="checkout-page py-5">
+    <div class="checkout-shell row g-0 mx-auto">
+        <div class="checkout-summary col-lg-5 p-4 p-lg-5">
+            <div class="hero-kicker">Secure checkout</div>
+            <h1 class="h2 fw-bold mt-3">Complete your purchase</h1>
+            <p class="text-muted">Demo card processing is enabled for testing. We never store your full card number; connect a hosted provider such as Stripe before going live.</p>
+            <div class="checkout-product mt-4">
+                <span class="small text-muted">Order summary</span>
+                <h2 class="h4 mt-2 mb-3">@Model.ProductName</h2>
+                @if (Model.PurchaseType == "Supplement")
+                {
+                    <p class="text-muted mb-0">Quantity: @Model.Quantity</p>
+                }
+                <div class="checkout-total">@Model.Total.ToString("F2") <small>лв.</small></div>
+            </div>
+            <div class="checkout-trust mt-4">
+                <span>✓</span> Encrypted checkout<br />
+                <span>✓</span> No full card storage<br />
+                <span>✓</span> Instant account confirmation
+            </div>
+        </div>
+        <div class="col-lg-7 p-4 p-lg-5">
+            <form asp-controller="Checkout" asp-action="@action" method="post">
+                <input type="hidden" asp-for="CardType" />
+                <input type="hidden" asp-for="SupplementId" />
+                <input type="hidden" asp-for="Quantity" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <h2 class="h5 fw-bold mb-4">Card details</h2>
+                <div class="form-floating mb-3">
+                    <input asp-for="CardNumber" class="form-control" placeholder="Card number" autocomplete="cc-number" inputmode="numeric" />
+                    <label asp-for="CardNumber">Card number</label>
+                    <span asp-validation-for="CardNumber" class="text-danger small"></span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-4">
+                        <label asp-for="ExpiryMonth" class="form-label">Month</label>
+                        <input asp-for="ExpiryMonth" class="form-control" placeholder="MM" min="1" max="12" autocomplete="cc-exp-month" />
+                        <span asp-validation-for="ExpiryMonth" class="text-danger small"></span>
+                    </div>
+                    <div class="col-4">
+                        <label asp-for="ExpiryYear" class="form-label">Year</label>
+                        <input asp-for="ExpiryYear" class="form-control" placeholder="YYYY" autocomplete="cc-exp-year" />
+                        <span asp-validation-for="ExpiryYear" class="text-danger small"></span>
+                    </div>
+                    <div class="col-4">
+                        <label asp-for="SecurityCode" class="form-label">CVV</label>
+                        <input asp-for="SecurityCode" class="form-control" placeholder="CVV" autocomplete="cc-csc" inputmode="numeric" />
+                        <span asp-validation-for="SecurityCode" class="text-danger small"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-warning btn-lg w-100 mt-4">Pay @Model.Total.ToString("F2") лв.</button>
+                <a asp-controller="@(Model.PurchaseType == "Membership" ? "Cards" : "Supplements")"
+                   asp-action="@(Model.PurchaseType == "Membership" ? "Index" : "Details")"
+                   asp-route-id="@Model.SupplementId" class="btn btn-outline-light w-100 mt-2">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

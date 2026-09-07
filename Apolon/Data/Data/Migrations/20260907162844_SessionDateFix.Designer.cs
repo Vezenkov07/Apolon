@@ -3,6 +3,7 @@ using System;
 using Apolon.Data.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Apolon.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260907162844_SessionDateFix")]
+    partial class SessionDateFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,9 +60,9 @@ namespace Apolon.Migrations
                     b.Property<DateOnly>("BookingDate")
                         .HasColumnType("date");
 
-                    b.Property<TimeOnly>("BookingTime")
+                    b.Property<string>("BookingTime")
                         .IsRequired()
-                        .HasColumnType("time without time zone");
+                        .HasColumnType("text");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text");
@@ -74,84 +77,9 @@ namespace Apolon.Migrations
 
                     b.HasIndex("TrainerId");
 
-                    b.HasIndex("TrainerId", "BookingDate", "BookingTime")
-                        .IsUnique();
-
                     b.HasIndex("UserId");
 
                     b.ToTable("Sessions");
-                });
-
-            modelBuilder.Entity("Apolon.Data.Models.SupplementPurchase", b =>
-                {
-                    b.Property<Guid>("PurchaseId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("PurchasedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("SupplementId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("PurchaseId");
-
-                    b.HasIndex("SupplementId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("SupplementPurchases");
-                });
-
-            modelBuilder.Entity("Apolon.Data.Models.PaymentTransaction", b =>
-                {
-                    b.Property<Guid>("PaymentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("LastFourDigits")
-                        .IsRequired()
-                        .HasMaxLength(4)
-                        .HasColumnType("character varying(4)");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("PaymentId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PaymentTransactions");
                 });
 
             modelBuilder.Entity("Apolon.Data.Models.Split", b =>
@@ -175,20 +103,6 @@ namespace Apolon.Migrations
                     b.HasKey("SplitId");
 
                     b.ToTable("Splits");
-
-                    b.HasData(
-                        new
-                        {
-                            SplitId = new Guid("10000000-0000-0000-0000-000000000001"),
-                            SplitName = "Strength and Power",
-                            TargetedMuscles = new[] { 6, 2, 8 }
-                        },
-                        new
-                        {
-                            SplitId = new Guid("10000000-0000-0000-0000-000000000002"),
-                            SplitName = "Full Body Conditioning",
-                            TargetedMuscles = new[] { 8, 7, 2 }
-                        });
                 });
 
             modelBuilder.Entity("Apolon.Data.Models.Supplement", b =>
@@ -232,93 +146,30 @@ namespace Apolon.Migrations
                     b.HasData(
                         new
                         {
-                            SupplementId = new Guid("90000000-0000-0000-0000-000000000001"),
+                            SupplementId = new Guid("99999999-9999-9999-9999-999999999999"),
                             BrandId = new Guid("33333333-3333-3333-3333-333333333333"),
                             CategoryId = new Guid("66666666-6666-6666-6666-666666666666"),
-                            Description = "Smooth vanilla whey blend with 24g of protein per serving for everyday recovery.",
-                            Name = "Gold Standard Whey Vanilla 2.27kg",
+                            Description = "High-quality whey protein isolate and concentrate supplying 24g of protein per serving.",
+                            Name = "Gold Standard 100% Whey 2.27kg",
                             Price = 149.99m
                         },
                         new
                         {
-                            SupplementId = new Guid("90000000-0000-0000-0000-000000000002"),
-                            BrandId = new Guid("33333333-3333-3333-3333-333333333333"),
-                            CategoryId = new Guid("66666666-6666-6666-6666-666666666666"),
-                            Description = "Rich chocolate whey blend designed to support muscle growth and recovery.",
-                            Name = "Gold Standard Whey Chocolate 2.27kg",
-                            Price = 149.99m
-                        },
-                        new
-                        {
-                            SupplementId = new Guid("90000000-0000-0000-0000-000000000003"),
-                            BrandId = new Guid("44444444-4444-4444-4444-444444444444"),
-                            CategoryId = new Guid("66666666-6666-6666-6666-666666666666"),
-                            Description = "Light strawberry whey protein for convenient post-workout nutrition.",
-                            Name = "Impact Whey Protein Strawberry 1kg",
-                            Price = 69.99m
-                        },
-                        new
-                        {
-                            SupplementId = new Guid("90000000-0000-0000-0000-000000000004"),
+                            SupplementId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                             BrandId = new Guid("44444444-4444-4444-4444-444444444444"),
                             CategoryId = new Guid("77777777-7777-7777-7777-777777777777"),
-                            Description = "Unflavored micronized creatine monohydrate to support strength and power.",
-                            Name = "Creatine Monohydrate Pure 500g",
+                            Description = "100% pure micronized creatine monohydrate proven to increase physical performance.",
+                            Name = "Creatine Monohydrate Unflavored 500g",
                             Price = 45.00m
                         },
                         new
                         {
-                            SupplementId = new Guid("90000000-0000-0000-0000-000000000005"),
-                            BrandId = new Guid("33333333-3333-3333-3333-333333333333"),
-                            CategoryId = new Guid("77777777-7777-7777-7777-777777777777"),
-                            Description = "Convenient creatine capsules for consistent daily supplementation.",
-                            Name = "Creatine Capsules 120 Count",
-                            Price = 39.99m
-                        },
-                        new
-                        {
-                            SupplementId = new Guid("90000000-0000-0000-0000-000000000006"),
+                            SupplementId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                             BrandId = new Guid("55555555-5555-5555-5555-555555555555"),
                             CategoryId = new Guid("88888888-8888-8888-8888-888888888888"),
-                            Description = "Classic energy and endurance formula with caffeine and beta-alanine.",
+                            Description = "Explosive energy and endurance formula enriched with Beta-Alanine and Caffeine.",
                             Name = "C4 Original Pre-Workout 390g",
                             Price = 59.90m
-                        },
-                        new
-                        {
-                            SupplementId = new Guid("90000000-0000-0000-0000-000000000007"),
-                            BrandId = new Guid("55555555-5555-5555-5555-555555555555"),
-                            CategoryId = new Guid("88888888-8888-8888-8888-888888888888"),
-                            Description = "Focused pre-workout energy formula for demanding training sessions.",
-                            Name = "Ultimate Energy Pre-Workout 300g",
-                            Price = 54.99m
-                        },
-                        new
-                        {
-                            SupplementId = new Guid("90000000-0000-0000-0000-000000000008"),
-                            BrandId = new Guid("44444444-4444-4444-4444-444444444444"),
-                            CategoryId = new Guid("66666666-6666-6666-6666-666666666666"),
-                            Description = "Refreshing clear whey isolate that mixes like a light fruit drink.",
-                            Name = "Clear Whey Isolate Lemon 500g",
-                            Price = 64.99m
-                        },
-                        new
-                        {
-                            SupplementId = new Guid("90000000-0000-0000-0000-000000000009"),
-                            BrandId = new Guid("33333333-3333-3333-3333-333333333333"),
-                            CategoryId = new Guid("66666666-6666-6666-6666-666666666666"),
-                            Description = "Coffee-flavored whey protein for recovery with a morning boost.",
-                            Name = "Gold Standard Whey Coffee 907g",
-                            Price = 79.99m
-                        },
-                        new
-                        {
-                            SupplementId = new Guid("90000000-0000-0000-0000-000000000010"),
-                            BrandId = new Guid("55555555-5555-5555-5555-555555555555"),
-                            CategoryId = new Guid("88888888-8888-8888-8888-888888888888"),
-                            Description = "Pre-workout blend for energy, focus, and intense training performance.",
-                            Name = "C4 Ripped Sport Pre-Workout 270g",
-                            Price = 62.99m
                         });
                 });
 
@@ -616,24 +467,6 @@ namespace Apolon.Migrations
                     b.HasIndex("TrainerId");
 
                     b.ToTable("Workouts");
-
-                    b.HasData(
-                        new
-                        {
-                            WorkoutId = new Guid("20000000-0000-0000-0000-000000000001"),
-                            EndTime = new DateTime(2026, 9, 10, 19, 0, 0, DateTimeKind.Utc),
-                            SplitId = new Guid("10000000-0000-0000-0000-000000000001"),
-                            StartTime = new DateTime(2026, 9, 10, 18, 0, 0, DateTimeKind.Utc),
-                            TrainerId = new Guid("33333333-3333-3333-3333-333333333333")
-                        },
-                        new
-                        {
-                            WorkoutId = new Guid("20000000-0000-0000-0000-000000000002"),
-                            EndTime = new DateTime(2026, 9, 12, 11, 0, 0, DateTimeKind.Utc),
-                            SplitId = new Guid("10000000-0000-0000-0000-000000000002"),
-                            StartTime = new DateTime(2026, 9, 12, 10, 0, 0, DateTimeKind.Utc),
-                            TrainerId = new Guid("44444444-4444-4444-4444-444444444444")
-                        });
                 });
 
             modelBuilder.Entity("Apolon.Data.Models.Card", b =>
@@ -662,36 +495,6 @@ namespace Apolon.Migrations
                         .IsRequired();
 
                     b.Navigation("Trainer");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Apolon.Data.Models.SupplementPurchase", b =>
-                {
-                    b.HasOne("Apolon.Data.Models.Supplement", "Supplement")
-                        .WithMany()
-                        .HasForeignKey("SupplementId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Apolon.Data.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Supplement");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Apolon.Data.Models.PaymentTransaction", b =>
-                {
-                    b.HasOne("Apolon.Data.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("User");
                 });

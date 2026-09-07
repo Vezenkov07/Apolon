@@ -1,0 +1,111 @@
+@model Apolon.Data.Models.ViewModels.BookTrainerViewModel
+
+@{
+    ViewData["Title"] = "Book Session";
+}
+
+<div class="booking-page d-flex align-items-center justify-content-center">
+
+    <div class="booking-card card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="row g-0">
+
+            <!-- Left Side: Trainer Profile -->
+            <div class="booking-trainer-image col-md-5 d-none d-md-block" style="background-image: url('@Model.TrainerImageUrl');">
+                <div class="booking-trainer-overlay h-100 d-flex flex-column justify-content-end p-4">
+                    <h3 class="text-warning fw-bold text-uppercase mb-0">@Model.TrainerName</h3>
+                    <p class="text-light mb-0">Personal Trainer</p>
+                </div>
+            </div>
+
+            <!-- Right Side: Booking Form -->
+            <div class="col-md-7">
+                <div class="card-body p-5 text-white">
+                    <div class="mb-4">
+                        <h2 class="fw-bold text-uppercase">Book Session</h2>
+                        <p class="text-muted">Schedule your 1-on-1 workout with @Model.TrainerName.</p>
+                    </div>
+
+                    <form method="post" asp-action="@(Model.SessionId.HasValue ? "Reschedule" : "Book")" asp-route-sessionId="@Model.SessionId">
+                        <input type="hidden" asp-for="TrainerId" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6 form-floating text-dark">
+                                <input type="date" asp-for="BookingDate" class="form-control rounded-3" id="floatingDate"
+                                       min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" required>
+                                <label for="floatingDate" class="ms-2">Date</label>
+                                <span asp-validation-for="BookingDate" class="text-danger small"></span>
+                            </div>
+                            <div class="col-sm-6 form-floating text-dark">
+                                <select asp-for="BookingTime" class="form-select rounded-3" id="floatingTime" required>
+                                    <option value="">Select an available time</option>
+                                    @foreach (var time in Model.AvailableTimes)
+                                    {
+                                        <option value="@time.ToString("HH\\:mm")"
+                                                selected="@(time == Model.BookingTime ? "selected" : null)">
+                                            @time.ToString("HH\\:mm")
+                                        </option>
+                                    }
+                                </select>
+                                <label for="floatingTime" class="ms-2">Available time</label>
+                                <span asp-validation-for="BookingTime" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-4 text-dark">
+                            <textarea asp-for="Notes" class="form-control rounded-3" id="floatingNotes" maxlength="500" style="height: 120px"></textarea>
+                            <label for="floatingNotes">Fitness goals or injuries (Optional)</label>
+                            <span asp-validation-for="Notes" class="text-danger small"></span>
+                        </div>
+
+                        <button class="btn btn-warning w-100 py-3 fw-bold rounded-3 text-dark text-uppercase mb-2" type="submit">
+                            @(Model.SessionId.HasValue ? "Save Changes" : "Confirm Booking")
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-light w-100 py-2 rounded-3">Cancel</a>
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const dateInput = document.getElementById("floatingDate");
+        const timeSelect = document.getElementById("floatingTime");
+        const trainerId = document.getElementById("TrainerId").value;
+        const selectedTime = "@Model.BookingTime.ToString("HH\\:mm")";
+
+        async function loadAvailableTimes() {
+            timeSelect.innerHTML = '<option value="">Loading available times...</option>';
+            timeSelect.disabled = true;
+
+            try {
+                const response = await fetch(`@Url.Action("AvailableTimes", "Trainers")?trainerId=${trainerId}&date=${dateInput.value}`);
+                if (!response.ok) {
+                    throw new Error("Unable to load availability.");
+                }
+
+                const times = await response.json();
+                timeSelect.innerHTML = times.length
+                    ? '<option value="">Select an available time</option>'
+                    : '<option value="">No times available for this date</option>';
+                times.forEach(time => {
+                    const option = document.createElement("option");
+                    option.value = time;
+                    option.textContent = time;
+                    option.selected = time === selectedTime;
+                    timeSelect.appendChild(option);
+                });
+            } catch {
+                timeSelect.innerHTML = '<option value="">Unable to load availability</option>';
+            } finally {
+                timeSelect.disabled = false;
+            }
+        }
+
+        dateInput.addEventListener("change", loadAvailableTimes);
+    </script>
+}

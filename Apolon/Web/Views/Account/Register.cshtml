@@ -1,10 +1,16 @@
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+
 @{
     ViewData["Title"] = "Register";
+    bool hasGoogle = !string.IsNullOrWhiteSpace(Configuration["Authentication:Google:ClientId"]) &&
+                     !string.IsNullOrWhiteSpace(Configuration["Authentication:Google:ClientSecret"]);
+    bool hasFacebook = !string.IsNullOrWhiteSpace(Configuration["Authentication:Facebook:AppId"]) &&
+                       !string.IsNullOrWhiteSpace(Configuration["Authentication:Facebook:AppSecret"]);
 }
 
-<div class="d-flex align-items-center justify-content-center" style="min-height: 80vh; background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop') no-repeat center center; background-size: cover; margin: -1rem -1rem 0 -1rem; padding: 2rem;">
+<div class="auth-page d-flex align-items-center justify-content-center">
     
-    <div class="card shadow-lg border-0 rounded-4" style="width: 100%; max-width: 500px; background-color: rgba(33, 37, 41, 0.95);">
+    <div class="auth-card card shadow-lg border-0 rounded-4">
         <div class="card-body p-5 text-white">
             <div class="text-center mb-4">
                 <h2 class="fw-bold text-uppercase">Start Your Journey</h2>
@@ -12,47 +18,61 @@
             </div>
 
             <form method="post" asp-action="Register">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                @if (TempData["ErrorMessage"] is string errorMessage)
+                {
+                    <div class="alert alert-warning" role="alert">@errorMessage</div>
+                }
                 <div class="row g-2 mb-3">
-                    <div class="col-md-6 form-floating text-dark">
-                        <input type="text" class="form-control rounded-3" id="floatingFirstName" placeholder="First Name" name="FirstName" required>
-                        <label for="floatingFirstName" class="ms-2">First Name</label>
+                    <div class="col-md-6">
+                        <label for="firstName" class="form-label">First name</label>
+                        <input type="text" class="form-control rounded-3" id="firstName" placeholder="First name" name="FirstName" autocomplete="given-name" required>
                     </div>
-                    <div class="col-md-6 form-floating text-dark">
-                        <input type="text" class="form-control rounded-3" id="floatingLastName" placeholder="Last Name" name="LastName" required>
-                        <label for="floatingLastName" class="ms-2">Last Name</label>
+                    <div class="col-md-6">
+                        <label for="lastName" class="form-label">Last name</label>
+                        <input type="text" class="form-control rounded-3" id="lastName" placeholder="Last name" name="LastName" autocomplete="family-name" required>
                     </div>
                 </div>
 
-                <div class="form-floating mb-3 text-dark">
-                    <input type="email" class="form-control rounded-3" id="floatingEmail" placeholder="name@example.com" name="Email" required>
-                    <label for="floatingEmail">Email address</label>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control rounded-3" id="email" placeholder="name@example.com" name="Email" autocomplete="email" required>
                 </div>
                 
-                <div class="form-floating mb-3 text-dark">
-                    <input type="password" class="form-control rounded-3" id="floatingPassword" placeholder="Password" name="Password" required>
-                    <label for="floatingPassword">Password</label>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control rounded-3" id="password" placeholder="Password" name="Password" autocomplete="new-password" required>
                 </div>
 
-                <div class="form-floating mb-4 text-dark">
-                    <input type="password" class="form-control rounded-3" id="floatingConfirmPassword" placeholder="Confirm Password" name="ConfirmPassword" required>
-                    <label for="floatingConfirmPassword">Confirm Password</label>
+                <div class="mb-4">
+                    <label for="confirmPassword" class="form-label">Confirm password</label>
+                    <input type="password" class="form-control rounded-3" id="confirmPassword" placeholder="Confirm password" name="ConfirmPassword" autocomplete="new-password" required>
                 </div>
 
                 <button class="btn btn-warning w-100 py-3 fw-bold rounded-3 mb-3 text-dark" type="submit">Create Account</button>
             </form>
-            <div class="text-center my-3 text-muted">
-                <hr class="border-secondary mb-3 mt-0">
-                <span class="small bg-dark text-white px-2 position-relative" style="top: -24px;">OR REGISTER WITH</span>
-            </div>
+            @if (hasGoogle || hasFacebook)
+            {
+                <div class="text-center my-3 text-muted">
+                    <hr class="border-secondary mb-3 mt-0">
+                    <span class="small bg-dark text-white px-2 position-relative" style="top: -24px;">OR REGISTER WITH</span>
+                </div>
 
-            <form method="post" asp-action="ExternalLogin" class="d-flex gap-2 mb-4">
-                <button type="submit" name="provider" value="Google" class="btn btn-outline-light w-100 py-2">
-                    <i class="bi bi-google text-danger me-2"></i> Google
-                </button>
-                <button type="submit" name="provider" value="Facebook" class="btn btn-outline-light w-100 py-2">
-                    <i class="bi bi-facebook text-primary me-2"></i> Facebook
-                </button>
-            </form>
+                <form method="post" asp-action="ExternalLogin" class="d-flex gap-2 mb-4">
+                    @if (hasGoogle)
+                    {
+                        <button type="submit" name="provider" value="Google" class="btn btn-outline-light w-100 py-2">
+                            Google
+                        </button>
+                    }
+                    @if (hasFacebook)
+                    {
+                        <button type="submit" name="provider" value="Facebook" class="btn btn-outline-light w-100 py-2">
+                            Facebook
+                        </button>
+                    }
+                </form>
+            }
             <div class="text-center mt-3">
                 <p class="text-white">Already a member? <a asp-action="Login" class="text-warning text-decoration-none fw-bold">Log In here</a></p>
             </div>

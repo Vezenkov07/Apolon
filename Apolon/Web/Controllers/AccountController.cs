@@ -1,20 +1,85 @@
 using System.Security.Claims;
 using Apolon.Data.Data;
 using Apolon.Data.Models;
+using Apolon.Data.Models.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Apolon.Controllers;
 
 public class AccountController : Controller
 {
-private readonly ApplicationDbContext context;
+    private readonly ApplicationDbContext context;
+    private readonly IConfiguration configuration;
 
-public AccountController(ApplicationDbContext _context)
-{
-    this.context = _context;
-}
+    public AccountController(ApplicationDbContext _context, IConfiguration configuration)
+    {
+        this.context = _context;
+        this.configuration = configuration;
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out Guid userId))
+        {
+            return Challenge();
+        }
+
+        var sessions = await context.Sessions
+            .Where(s => s.UserId == userId &&
+                        s.BookingDate >= DateOnly.FromDateTime(DateTime.Today))
+            .Include(s => s.Trainer)
+            .OrderBy(s => s.BookingDate)
+            .ThenBy(s => s.BookingTime)
+            .ToListAsync();
+
+        var cards = await context.Cards
+            .Where(c => c.UserId == userId)
+            .OrderByDescending(c => c.CardId)
+            .ToListAsync();
+
+        var purchases = await context.SupplementPurchases
+            .Where(p => p.UserId == userId)
+            .Include(p => p.Supplement)
+            .OrderByDescending(p => p.PurchasedAt)
+            .ToListAsync();
+
+        return View(new AccountViewModel
+        {
+            Sessions = sessions,
+            Cards = cards,
+            SupplementPurchases = purchases
+        });
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cancel(Guid sessionId)
+    {
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out Guid userId))
+        {
+            return Challenge();
+        }
+
+        Session? session = await context.Sessions
+            .SingleOrDefaultAsync(s => s.SessionId == sessionId && s.UserId == userId);
+        if (session is null)
+        {
+            return NotFound();
+        }
+
+        context.Sessions.Remove(session);
+        await context.SaveChangesAsync();
+        TempData["SuccessMessage"] = "Your session was cancelled.";
+        return RedirectToAction(nameof(Index));
+    }
+
     [HttpGet]
     public IActionResult Login() => View();
 
@@ -84,8 +149,24 @@ public AccountController(ApplicationDbContext _context)
         return RedirectToAction("Index", "Home");
     }
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult ExternalLogin(string provider)
     {
+        var isConfigured = provider switch
+        {
+            "Google" => !string.IsNullOrWhiteSpace(configuration["Authentication:Google:ClientId"]) &&
+                        !string.IsNullOrWhiteSpace(configuration["Authentication:Google:ClientSecret"]),
+            "Facebook" => !string.IsNullOrWhiteSpace(configuration["Authentication:Facebook:AppId"]) &&
+                          !string.IsNullOrWhiteSpace(configuration["Authentication:Facebook:AppSecret"]),
+            _ => false
+        };
+
+        if (!isConfigured)
+        {
+            TempData["ErrorMessage"] = $"{provider} sign-in is not configured.";
+            return RedirectToAction(nameof(Register));
+        }
+
         var properties = new AuthenticationProperties { RedirectUri = Url.Action("ExternalLoginCallback") };
         return Challenge(properties, provider);
     }
