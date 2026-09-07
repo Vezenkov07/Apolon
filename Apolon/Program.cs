@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+//asdf
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                         ?? "Host=localhost;Port=5432;Database=apolon;Username=postgres";
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
